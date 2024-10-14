@@ -23,22 +23,61 @@
                         <input type="team_name" class="form-control" id="team_name">
                         <button type="submit" class="btn btn-primary float-end ms-2"><i class="bi bi-small bi-floppy text-light"></i></button>
                     </div>
-                  </div>
+                </div>
             </form>
         </div>
-
+    </div>
     <div class="my-4 mx-2 row">
+        <h3 class="text-center text-success">Permissions</h3>
+        <div class="col-6">
+            <div class="card border-success mb-3 h-100">
+                <div class="card-header bg-light-success fw-bold text-success"><i class="bi bi-list-check"></i> Rules</div>
+                <div class="card-body text-success">
+                    @foreach ($team->roles as $role)
+                        <div class="row mb-3 border border-top"><span class="card-text col-11">{{ $role->name }}</span> <button class="col-1 btn btn-warning float-end text-light" id="delete_role_{{$role->id}}"><i class="bi bi-small bi-ban text-light"></i></button></div>
+                        <ul>
+                            @foreach ($role->capabilities as $capability)
+                                <li>{{ $capability->code }}</li>
+                            @endforeach
+                        </ul>
+                    @endforeach
+                </div>
+                <div class="card-footer bg-light-success">
+                    <form>
+                        <button class="btn btn-danger float-end text-light mx-2" id="delete_rule_1"><i class="bi bi-small bi-trash text-light"></i></button>
+                        <button class="btn btn-primary float-end text-light"><i class="bi bi-small bi-plus text-light"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="card border-success mb-3 h-100">
+                <div class="card-header bg-light-success fw-bold text-success"><i class="bi bi-tools"></i> Abilities</div>
+                <div class="card-body text-success">
+                    @foreach ($team->abilities as $ability)
+                        <div class="row mb-3 border border-top"><span class="card-text col-11">{{ $ability->title }}</span> <button class="col-1 btn btn-warning float-end text-light" id="delete_ability_{{$ability->id}}"><i class="bi bi-small bi-ban text-light"></i></button></div>
+                    @endforeach
+                </div>
+                <div class="card-footer bg-light-success">
+                    <form>
+                        <button class="btn btn-danger float-end text-light mx-2" id="delete_permission_1"><i class="bi bi-small bi-trash text-light"></i></button>
+                        <button class="btn btn-primary float-end text-light"><i class="bi bi-small bi-plus text-light"></i></button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="my-4 mx-2 row">
+        <h3 class="text-center text-success">Groups</h3>
         @foreach($team->groups as $group)
             <div class="col-4 mt-2">
-                <div class="card border-success mb-3">
-                    <div class="card-header bg-light-success">Group: <b>{{ $group->name }}</b></div>
+                <div class="card border-success mb-3 h-100">
+                    <div class="card-header bg-light-success fw-bold text-success"><i class="bi bi-people"></i> {{ $group->name }}</div>
                     <div class="card-body text-success">
                         <h5 class="card-title">Users</h5>
                         @foreach ($group->users as $user)
-                            <div class="row mb-3 border border-top"><span class="card-text col-11">{{ $user->name }}</span> <button class="col-1 btn btn-warning float-end text-light" id="delete_group_{{$group->id}}"><i class="bi bi-small bi-ban text-light"></i></button></div>
-                            <div class="row mb-3 border border-top"><span class="card-text col-11">{{ $user->name }}</span> <button class="col-1 btn btn-warning float-end text-light" id="delete_group_{{$group->id}}"><i class="bi bi-small bi-ban text-light"></i></button></div>
-                            <div class="row mb-3 border border-top"><span class="card-text col-11">{{ $user->name }}</span> <button class="col-1 btn btn-warning float-end text-light" id="delete_group_{{$group->id}}"><i class="bi bi-small bi-ban text-light"></i></button></div>
-                        @endforeach
+                            <div class="row mb-3 border border-top"><span class="card-text ps-5 col-11 my-auto"><b>{{$user->teamRole($team)->name}}: </b> {{ $user->name }}</span> <button class="col-1 btn btn-warning float-end text-light" id="delete_group_{{$group->id}}"><i class="bi bi-small bi-ban text-light"></i></button></div>
+                         @endforeach
                     </div>
                     <div class="card-footer bg-light-success">
                         <form>

@@ -71,19 +71,21 @@ class RegisteredUserController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            $team->addRole('admin', [
+            $team->addRole('Global administration', [
                 'humanresources.*',
                 'employees.*',
                 'securities.*',
                 'cards.*',
             ]);
 
-            $team->addRole('hr', [
+            $team->addRole('User administration', [
                 'employees.*',
-                'securities.*'
+                'securities.*',
+                'card.view',
+                'card.block'
             ]);
 
-            $team->addRole('user', [
+            $team->addRole('Card administration', [
                 'card.view',
                 'card.block'
             ]);
