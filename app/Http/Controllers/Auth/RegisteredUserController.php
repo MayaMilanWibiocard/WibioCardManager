@@ -71,28 +71,7 @@ class RegisteredUserController extends Controller
                 'user_id' => $user->id,
             ]);
 
-            $team->addRole('Global administration', [
-                'humanresources.*',
-                'employees.*',
-                'securities.*',
-                'cards.*',
-            ]);
-
-            $team->addRole('User administration', [
-                'employees.*',
-                'securities.*',
-                'card.view',
-                'card.block'
-            ]);
-
-            $team->addRole('Card administration', [
-                'card.view',
-                'card.block'
-            ]);
-
-            $team->addGroup('hr', 'Human Resources');
-            $team->addGroup('us', 'Employees');
-
+            $team->addRole('External user', ['card.view']);
             event(new Registered($user));
 
             Auth::login($user);
@@ -106,9 +85,7 @@ class RegisteredUserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-
-            $team->users()->attach($user, ['role_id' => $team->findRole('user')->id]);
-            $team->group('us')->attachUser($user);
+            $team->users()->attach($user, ['role_id' => $team->findRole('External user')->id]);
             event(new Registered($user));
 
             Auth::login($user);

@@ -1,6 +1,6 @@
 @import 'bootstrap/scss/bootstrap';
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
-
+@import 'bootstrap-select/sass/bootstrap-select.scss';
 
 
 :root,[data-bs-theme=light] {
@@ -126,6 +126,22 @@
 .bg-light-success {
     --bs-bg-opacity: 0.15;
     background-color: rgba(var(--bs-success-rgb),var(--bs-bg-opacity))!important
+}
+.bg-light-primary {
+    --bs-bg-opacity: 0.15;
+    background-color: rgba(var(--bs-primary-rgb),var(--bs-bg-opacity))!important
+}
+.bg-light-danger {
+    --bs-bg-opacity: 0.15;
+    background-color: rgba(var(--bs-danger-rgb),var(--bs-bg-opacity))!important
+}
+.bg-light-secondary {
+    --bs-bg-opacity: 0.15;
+    background-color: rgba(var(--bs-secondary-rgb),var(--bs-bg-opacity))!important
+}
+.bg-light-warning {
+    --bs-bg-opacity: 0.15;
+    background-color: rgba(var(--bs-warning-rgb),var(--bs-bg-opacity))!important
 }
 .rounded-4 {
     border-radius: var(--bs-border-radius-xl) !important;
