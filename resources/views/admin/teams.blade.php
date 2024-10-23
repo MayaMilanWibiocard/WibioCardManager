@@ -10,7 +10,12 @@
             <div class="card border-success bg-light-success mb-3 h-100 w-100">
                 <div class="card-title text-success my-auto mx-5">
                         <h3>TEAM : {{ $team->name }}</h3>
-                        <button class="btn btn-success float-end ms-2" type="submit"><i class="bi bi-envelope-plus text-light"></i></button>
+                        @if(Auth::user()->ownsTeam($team) || Auth::user()->teamRole($team)->capabilities->where('code', 'employees.*')->count() >0)
+                            <a href="" class="btn btn-success float-end ms-2" type="submit"><i class="bi bi-envelope-plus text-light"></i></a>
+                        @endif
+                        @if(Auth::user()->ownsTeam($team) || Auth::user()->teamRole($team)->capabilities->where('code', 'cards.*')->count() >0)
+                            <a href="{{ @route('cards', $team->id) }}" class="btn btn-secondary float-end ms-2" type="submit"><i class="bi bi-credit-card text-light"></i></a>
+                        @endif
                 </div>
             </div>
         </div>
@@ -147,17 +152,20 @@
             </div>
         @endif
         @foreach($team->groups as $group)
-            <div class="col-3 mt-2">
+            <div class="col-4 mt-2">
                 <div class="card border-success mb-3 h-100">
                     <div class="card-header bg-light-success fw-bold text-success"><i class="bi bi-people-fill"></i> {{ $group->name }}</div>
                     <div class="card-body text-success">
                         <h5 class="card-title">Users</h5>
                         @foreach ($group->users as $user)
-                            <div class="row mb-3 border border-top">
-                                <span class="card-text ps-5 col-11 my-auto"><b>{{$user->teamRole($team)->name}}: </b> {{ $user->name }}</span>
+                            <div class="row mb-3 border border-top ps-5">
+                                <div class="col-10"><span class="card-text my-auto"><b>{{$user->teamRole($team)->name}}: </b> {{ $user->name }}</span></div>
                                 @if(Auth::user()->ownsTeam($team) || Auth::user()->teamRole($team)->capabilities->where('code', 'employees.*')->count() >0)
-                                    <button class="col-1 btn btn-warning float-end text-light" data-action="{{@route('teams.groups.ban', [$team->id, $group->id, $user->id])}}"><i class="bi bi-small bi-ban text-light"></i></button></div>
+                                    <div class="col-2">
+                                        <button class="btn btn-warning float-end" data-action="{{@route('teams.groups.ban', [$team->id, $group->id, $user->id])}}"><i class="bi bi-small bi-ban text-light"></i></button>
+                                    </div>
                                 @endif
+                            </div>
                          @endforeach
                     </div>
                     @if(Auth::user()->ownsTeam($team) || Auth::user()->teamRole($team)->capabilities->where('code', 'employees.*')->count() >0)

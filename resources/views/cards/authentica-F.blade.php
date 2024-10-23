@@ -8,7 +8,7 @@
                     <span  class="my-auto ms-2" ><b>Type:</b> F</span>
                 </div>
                 <div class="card-body">
-                    <img src="images/type F.png" alt="Wibio smartcard type-F" class="mx-auto my-auto">
+                    <img src="{{ Vite::asset('resources/images/type F.png') }}" alt="Wibio smartcard type-F" class="mx-auto my-auto">
                 </div>
                 <div class="card-footer text-muted">Card state: <span id="cardstate">present</span></div>
             </div>
@@ -22,17 +22,7 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-8">
-                            <select class="form-select" size="10" aria-label="size 3 select example">
-                                <option value="1">One</option>
-                                <option value="2">Two</option>
-                                <option value="3">Three</option>
-                                <option value="4">Four</option>
-                                <option value="5">Five</option>
-                                <option value="6">Six</option>
-                                <option value="7">Seven</option>
-                                <option value="8">Eight</option>
-                                <option value="9">Nine</option>
-                                <option value="10">Ten</option>
+                            <select class="form-select" size="10"  id="sequences" aria-label="size 3 select example">
                             </select>
                             <button class="my-2 btn btn-success w-100" id ="getOtp">Get OTP</button>
                             <div class="text-center">
@@ -45,7 +35,7 @@
                             </div>
                         </div>
                         <div class="col-4 sensor_container">
-                            <img src="images/fingerprint_partial.png" id="imgfinger" class="mx-auto" alt="Wibio fingerprint request">
+                            <img src="{{ Vite::asset('resources/images/fingerprint_partial.png') }}" id="imgfinger" class="mx-auto display-none" alt="Wibio fingerprint request">
                         </div>
                     </div>
                 </div>
@@ -61,11 +51,12 @@
                 <div class="card-body">
                     <div class="card-body">
                         <div class="form mb-3">
-                            <button class="my-2 btn btn-primary w-100">Card management</button>
                             <button class="btn btn-danger w-100">Block smartcard</button>
+                            <p class="text-muted text-sm">This action will block the smartcard but to perform this operation you need to verify the fingerprint. <br/> If you have issues with the fingerprint sensor on your card please contact your security administrator.</p>
                         </div>
                     </div>
                 </div>
+                <div class="card-footer text-muted">User email: <span id="user_email">{{ Auth::user()->email }}</span></div>
             </div>
         </div>
     </div>

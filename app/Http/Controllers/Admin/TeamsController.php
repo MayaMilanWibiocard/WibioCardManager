@@ -19,7 +19,8 @@ class TeamsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $teams = $user->teams ?? [];
+        $teams = new \Illuminate\Database\Eloquent\Collection;
+        $teams = $teams ->concat($user->teams)->concat($user->ownedTeams);
         $capabilities = Capability::All();
         return view('admin.teams', compact('teams', 'capabilities'));
     }
@@ -27,7 +28,7 @@ class TeamsController extends Controller
     public function renameTeam($team_id, Request $request)
     {
         if (!$request->team_name) {
-            return Redirect::back()->withErrors('Team name is required');
+            return Redirect::back()->withError('Team name is required');
         }
         $team = Auth::user()->ownedTeams()->where('id', $team_id)->first();
         if ($team) {
@@ -35,14 +36,14 @@ class TeamsController extends Controller
             $team->save();
         }
         else
-            return Redirect::back()->withErrors('You do not own this team');
+            return Redirect::back()->withError('You do not own this team');
         return Redirect::back()->withSuccess('Team name updated successfully');
     }
 
     public function createRules($team_id, Request $request)
     {
         if (!$request->rule_name) {
-            return Redirect::back()->withErrors('Rule name is required');
+            return Redirect::back()->withError('Rule name is required');
         }
         $team = Team::where('id', $team_id)->first();
         if ($team && $this->checkCapability($team, Auth::user(), 'administrators.*'))
@@ -67,7 +68,7 @@ class TeamsController extends Controller
     public function createGroups($team_id, Request $request)
     {
         if (!$request->group_name) {
-            return Redirect::back()->withErrors('Group name is required');
+            return Redirect::back()->withError('Group name is required');
         }
         $team = Team::where('id', $team_id)->first();
         if ($team && $this->checkCapability($team, Auth::user(), 'employees.*'))

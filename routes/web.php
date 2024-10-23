@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\TeamsController;
+use App\Http\Controllers\Admin\CardsController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -29,6 +30,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/teams/groups/delete/{team_id}/{group}', [TeamsController::class, 'deleteGroups'])->name('teams.groups.del');
     Route::get('/teams/groups/ban/{team_id}/{group}/{user}', [TeamsController::class, 'banGroups'])->name('teams.groups.ban');
     Route::post('/teams/groups/attach/{team_id}/{group}', [TeamsController::class, 'attachGroups'])->name('teams.groups.attach');
+
+    Route::get('/cards/index/{team_id}', [CardsController::class, 'index'])->name('cards');
 });
 
 Route::group(['prefix' => 'admin', 'middleware' => ['role:admin,team_id']], function() {

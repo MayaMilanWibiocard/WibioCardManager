@@ -17,8 +17,36 @@
         @vite(['resources/js/vanilla.js'])
     </head>
     <body class="font-sans antialiased">
+
         <div class="min-h-screen bg-gray-100">
             @include('layouts.navigation')
+            @if(session()->has('error'))
+                <div class="toast show float-end" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="bi bi-emoji-tear-fill text-danger me-3"></i>
+                        <strong class="me-auto">Error</strong>
+                        <small>{{ date('Y-m-d H:i:s') }}</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body text-danger">
+                        {{ session()->get('error') }}
+                    </div>
+                </div>
+            @endif
+
+            @if(session()->has('success'))
+                <div class="toast show float-end" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="bi bi-emoji-smile-fill text-success  me-3"></i>
+                        <strong class="me-auto">Success</strong>
+                        <small>{{ date('Y-m-d H:i:s') }}</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body text-success">
+                        {{ session()->get('success') }}
+                    </div>
+                </div>
+            @endif
 
             <!-- Page Heading -->
             @isset($header)

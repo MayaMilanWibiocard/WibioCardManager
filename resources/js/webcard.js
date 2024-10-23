@@ -5,8 +5,7 @@
 // IIFE BEGIN
 (() =>
 {
-    const WEBCARD_VERSION = '0.4.0';
-    const WEBCARD_HOMEPAGE = 'https://webcard.cardid.org';
+    const WEBCARD_VERSION = '0.0.1';
 
     /**************************************************************************/
     // `Reader` class.
@@ -25,8 +24,12 @@
         self.disconnect = () =>
             navigator.webcard.send(3, { r: self.index });
 
-        self.transceive = (apdu) =>
-            navigator.webcard.send(4, { r: self.index, a: apdu });
+        self.transceive = (apdu, params) => {
+            let otherParams = { r: self.index, a: apdu }
+            if(params && Object.keys(params).length)
+                otherParams.p = params
+            return navigator.webcard.send(4, otherParams);
+        }
     }
 
     /**************************************************************************/
@@ -34,33 +37,23 @@
     function WebCard()
     {
         let self = this;
+        let _subscriptionsList = [];
         let _readerList;
 
         console.info('Starting WebCard...');
 
         // Install check.
-        self.isReady = (null != document.getElementById('webcard-install-banner'));
-
-        if (navigator.userAgent.includes('Windows NT'))
-        {
-            self.installerUrl = `${WEBCARD_HOMEPAGE}/webcard.msi`;
-        }
-        else
-        {
-            self.installerUrl = `${WEBCARD_HOMEPAGE}/webcard.pkg`;
-        }
+        self.isReady = (null != document.getElementById('webcard-ready'));
 
         if (!self.isReady)
         {
           let banner = document.createElement('div');
-          banner.id = "webcard-install-banner";
+          banner.id = "webcard-ready";
           banner.style = "width:100%;top:0;left:0;position:fixed;"
             + "background-color:rgba(250,250,210,0.85);border-bottom:1px solid gold;z-index:1030;"
           banner.innerHTML = `
             <p style="margin:8pt;font:11pt Helvetica;color:black;">
-              This page needs you to install the 
-              <a href="${self.installerUrl}">Smart Card Extension</a>
-              to access your smart card readers.
+              Something went wrong. Try to reinstall the extension.
             </p>
           `;
           document.body.appendChild(banner);
@@ -189,6 +182,10 @@
         self.readers = () =>
             self.send(1);
 
+        // Fetches APIKEY
+        self.apiKey = () =>
+            self.send(5);
+
         // Handling content script (Native App) responses.
         self.responseCallback = (msg) =>
         {
@@ -244,6 +241,8 @@
                     }
                 }
 
+                _subscriptionsList[msg.e]?.forEach(async c => await c?.apply(c))
+
                 return;
             }
 
@@ -265,6 +264,10 @@
                 // Response marked as incomplete
                 // (error on the Native App's side).
                 request.reject();
+            }
+            else if (msg.k)
+            {
+                request.resolve(msg.k)
             }
             else switch (request.c)
             {
@@ -321,6 +324,20 @@
             }
 
             self.pendingRequests.delete(msg.i);
+        }
+
+        self.subscribeEvents = (eventTypes, callback) => {
+            if(!eventTypes || !eventTypes.length)
+                return false;
+
+            for(const type of eventTypes){
+                if(!_subscriptionsList[type]){
+                    _subscriptionsList[type] = [];
+                }
+                _subscriptionsList[type].push(callback);
+            }
+
+            return true;
         }
     };
 

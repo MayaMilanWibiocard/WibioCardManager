@@ -4,6 +4,8 @@ namespace App\Models\Backend;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Sales\Customer;
 
 class DesktopSecretKeys extends Model
 {
@@ -26,4 +28,9 @@ class DesktopSecretKeys extends Model
     protected $casts = [
         'oneShotSecretKey' => 'hashed',
     ];
+
+    public function Customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'company', 'company');
+    }
 }
