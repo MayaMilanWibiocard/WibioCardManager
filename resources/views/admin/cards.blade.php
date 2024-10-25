@@ -4,11 +4,15 @@
             {{ __('Cards') }}
         </h2>
     </x-slot>
+    <div class="d-flex d-flex-inline w-75  mx-auto my-3">
+    <input type="text" class="form-control mx-auto w-75" id="search" placeholder="Search for a card..">
+    <button class="btn btn-primary mx-auto anchor_link">Search</button>
+    </div>
     <table class="table table-striped small w-75 mx-auto">
         @foreach ($customer->CustomerCards as $card)
             <thead>
                 <tr class="table-success">
-                    <th scope="col"><img src="{{ Vite::asset('resources/images/type '. $card->card_type .'.png') }}" alt="Wibio smartcard type-F" width="100px" class=" float-start mx-auto my-auto"></th>
+                    <th scope="col"  id="section-{{ $card->card_uid }}"><img src="{{ Vite::asset('resources/images/type '. $card->card_type .'.png') }}" alt="Wibio smartcard type-F" width="100px" class=" float-start mx-auto my-auto"></th>
                     <th scope="col">{{ $card->card_uid }}<a {{ @route('token.lock', $card->id) }} class="btn btn-danger float-end"><i class="bi bi-small bi-ban text-light"></i></a></th>
                 </tr>
             </thead>

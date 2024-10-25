@@ -43,3 +43,12 @@ import.meta.glob([
             console.log(await response.json());
         });
     }
+
+
+    const anchorLink = document.getElementsByClassName("anchor_link");
+    for (let i = 0; i < anchorLink.length; i++) {
+        anchorLink[i].addEventListener('click', function (e)  {
+            e.preventDefault();
+            window.scroll(0, document.getElementById('section-' + document.getElementById("search").value).offsetTop);
+        });
+    }
