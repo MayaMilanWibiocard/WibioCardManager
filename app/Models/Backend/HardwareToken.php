@@ -23,7 +23,8 @@ class HardwareToken extends Model
         'tlen',
         'otp_type',
         'intend',
-        'comment'];
+        'comment'
+    ];
 
     public function CustomerCard(): BelongsTo
     {

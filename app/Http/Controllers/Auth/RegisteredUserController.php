@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Linotp\LinOtpUser;
 use Jurager\Teams\Teams;
 use \Jurager\Teams\Models\Team;
 use Illuminate\Auth\Events\Registered;
@@ -66,6 +67,12 @@ class RegisteredUserController extends Controller
                 'password' => Hash::make($request->password),
             ]);
 
+            LinOtpUser::create([
+                'user' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password+rand(1000,9999)),
+            ]);
+
             $team = Team::create([
                 'name' => $request->team,
                 'user_id' => $user->id,
@@ -85,6 +92,13 @@ class RegisteredUserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
+
+            LinOtpUser::create([
+                'user' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password+rand(1000,9999)),
+            ]);
+
             $team->users()->attach($user, ['role_id' => $team->findRole('External user')->id]);
             event(new Registered($user));
 

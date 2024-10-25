@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use Jurager\Teams\Models\Team;
-use App\Models\Sales\CustomerCards;
+use App\Models\Sales\CustomerCard;
 
 class Customer extends Model
 {
@@ -21,7 +21,7 @@ class Customer extends Model
 
     public function CustomerCards(): HasMany
     {
-        return $this->hasMany(CustomerCards::class, 'crm_product_id', 'id');
+        return $this->hasMany(CustomerCard::class, 'customer_id', 'id');
     }
 
     public function Team(): BelongsTo

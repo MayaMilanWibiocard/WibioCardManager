@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use App\Models\Backend\HardwareToken;
+use App\Models\Sales\Customer;
 
 class CustomerCard extends Model
 {

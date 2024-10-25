@@ -1,5 +1,6 @@
 
 import './bootstrap';
+import 'laravel-datatables-vite';
 import 'bootstrap';
 import Alpine from 'alpinejs';
 import '../../node_modules/bootstrap-select/dist/js/bootstrap-select.min.js';

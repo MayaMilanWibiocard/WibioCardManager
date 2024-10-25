@@ -22,8 +22,6 @@ class InviteTeamMember implements InvitesTeamMembers
      */
     public function invite(mixed $user, mixed $team, string $email, ?string $role = null): void
     {
-        Gate::forUser($user)->authorize('addTeamMember', $team);
-
         $this->validate($team, $email, $role);
 
         InvitingTeamMember::dispatch($team, $email, $role);
@@ -58,9 +56,7 @@ class InviteTeamMember implements InvitesTeamMembers
             'email' => ['required', 'email', Rule::unique('invitations')->where(function ($query) use ($team) {
                 $query->where(config('teams.foreign_keys.team_id', 'team_id'), $team->id);
             })],
-            'role' => Teams::hasRoles()
-                ? ['required', 'string', new Role($team)]
-                : null,
+            'role' => ['required', 'string', new Role($team)]
         ]);
     }
 

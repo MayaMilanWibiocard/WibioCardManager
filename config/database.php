@@ -103,6 +103,22 @@ return [
         ],
 
 
+        'linotp' => [
+            'driver' => 'mysql',
+            'host' => '51.89.118.53',
+            'port' => '3306',
+            'database' => 'UserDB',
+            'username' => 'remoteUSer',
+            'password' => 'Clmt6adryN9S',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+        ],
+
     ],
 
     /*

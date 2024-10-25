@@ -117,12 +117,13 @@ class TeamsController extends Controller
         return Redirect::back()->withError('Unauthorized action for this team');
     }
 
-    public function inviteGroups($team_id, $email, $role)
+    public function inviteMember($team_id, Request $request)
     {
         $team = Team::where('id', $team_id)->first();
         if ($team && $this->checkCapability($team, Auth::user(), 'employees.*'))
         {
-            invite(Auth::user(), $team, $email, $role);
+            $invite = new InviteTeamMember();
+            $invite->invite(Auth::user(), $team, $request->email, $request->role);
             return Redirect::back()->withSuccess('User invitation sended');
         }
         return Redirect::back()->withError('Unauthorized action for this team');
