@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/cards/index/{team_id}', [CardsController::class, 'index'])->name('cards');
     Route::get('/cards/token/lock/{id}', [CardsController::class, 'lockToken'])->name('token.lock');
+    Route::get('/cards/token/attach/{team_id}/{token}', [CardsController::class, 'attachToken'])->name('cards.attach');
 });
 
 Route::group(['prefix' => 'admin', 'middleware' => ['role:admin,team_id']], function() {

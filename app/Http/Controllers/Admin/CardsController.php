@@ -63,4 +63,25 @@ class CardsController extends Controller
         }
         return Redirect::back()->withError('Unable to lock token');
     }
+
+    public function attachToken($team_id, $token)
+    {
+        $Team = Team::find($team_id);
+        if (!$Team) return Redirect::back()->withError('Team not found');
+
+        $HardwareToken = HardwareToken::where('token', $token)->first();
+        if (!$HardwareToken) return Redirect::back()->withError('Token not found');
+
+        $Customer = Customer::where('company', $Team->name)->first();
+        if (!$Customer) return Redirect::back()->withError('Customer not assigned to this team');
+
+        $CustomerCard = CustomerCard::with(['crmProduct'])->where('customer_id', $Customer->id)->where('card_uid', $HardwareToken->card_id)->first();
+        if (!$CustomerCard) return Redirect::back()->withError('Customer not assigned to this team');
+
+        if ($CustomerCard->reset_count >= $CustomerCard->crmProduct->product_reusability)
+            return Redirect::back()->withError("Card personalization and enrollment is locked, please contact your administrator or use another card. The card is reusable only ".$CustomerCard->crmProduct->product_reusability." times.");
+        else
+            return view('admin.card_perso', compact('Team', 'HardwareToken', 'Customer', 'CustomerCard'));
+    }
+
 }

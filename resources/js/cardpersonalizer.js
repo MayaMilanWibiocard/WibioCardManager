@@ -49,7 +49,7 @@ async function listReaders() {
             });
             d.querySelector("#b_mess").appendChild(ul);
     } catch(ex){
-        d.querySelector("#f_mess").innerHTML = ex.message;
+        d.querySelector("#f_mess").innerHTML = ex;
         d.querySelector("#f_mess").classList.replace("text-success", "text-danger");
     }
     finally {
@@ -80,8 +80,8 @@ async function getSupportedCards(renew = false)
         const data = await response.json();
         _supportedCards = [...(data.Cards || [])];
         return _supportedCards;
-    } catch(err){
-        console.error(err);
+    } catch(ex){
+        console.error(ex);
     }
     throw 'No supported cards found'
 }
@@ -95,8 +95,8 @@ async function checkCardByAtr(Atr){
             }
         })
         return await response.json()
-    } catch(err) {
-        console.error(err);
+    } catch(ex) {
+        console.error(ex);
     }
     throw 'Check card by atr failed'
 }
@@ -115,10 +115,12 @@ async function loadInterface(reader)
         if(Array.isArray(check.Id) && check.Id.length > 1) {
             if(!check.GetVersion)
                 throw 'Needed command GetVersion not found'
+            await reader.connect(true);
             const idIdx = await execOnReader(reader, {
                 name: 'GetVersion',
                 command: check.GetVersion
             })
+            reader.disconnect();
             _cardId = check.Id[idIdx[0].result.cmdIdx]
             _cardType = check.Type[idIdx[0].result.cmdIdx];
         } else {
@@ -126,30 +128,31 @@ async function loadInterface(reader)
             _cardType = check.Type[0];
         }
         _reader = reader;
-        fetchPartialPage('/authentica'+_cardType, '#card_div');
+        executePartialScript(_cardType);
         hideSpinner();
-    } catch(err){
-        manageMessages("#b_mess", "d", ex.message);
+    } catch(ex){
+        manageMessages("#b_mess", "d", ex);
     }
 }
 
 function unloadInterface(reader)
 {
     if (reader == _reader)
-        {
-            manageMessages("#h_mess", "d", "Card removed");
-            manageMessages("#t_mess", null, "Card removed in " + reader.name);
-            manageMessages("#b_mess", null, "");
-            manageMessages("#f_mess", "d", "Put your card on the reader to continue working");
-            d.querySelector('#card_div').innerHTML = "";
-            _cardId = null;
-            _cardType = null;
-            _reader.disconnect();
-            _reader = null;
-        }
+    {
+        manageMessages("#h_mess", "d", "Card removed");
+        manageMessages("#t_mess", null, "Card removed in " + reader.name);
+        manageMessages("#b_mess", null, "");
+        manageMessages("#f_mess", "d", "Put your card on the reader to continue working");
+        d.querySelector('#card_div').innerHTML = "";
+        _cardId = null;
+        _cardType = null;
+        _reader.disconnect();
+        _reader = null;
+    }
 }
 
-async function getCommand(cardId, commandName) {
+async function getCommand(cardId, commandName)
+{
     try {
         const response = await fetch(`${baseUrl}/generateCommand/${cardId}/${channel}/${commandName}`, {
             method: 'GET',
@@ -158,31 +161,30 @@ async function getCommand(cardId, commandName) {
             }
         })
         return await response.json()
-    } catch(err) {
+    } catch(ex) {
         manageMessages("#b_mess", "d", "Error during command generation. Check your internet connection and try again");
     }
 }
 
-async function verifyTokenByEmail(token) {
+async function generateCommand(cardId, commandName, request)
+{
     try {
-        let email =  d.querySelector("#user_email").innerHTML;
-        const response = await fetch(`${baseUrl}/verifyTokenByEmail/${token}/${email}`, {
-            method: 'GET',
+        const response = await fetch(`${baseUrl}/generateCommand/${cardId}/${channel}/${commandName}`, {
+            method: 'POST',
             headers: {
-            'X-Authorization': apiKey
-            }
+                'X-Authorization': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(request)
         })
-        return await response.text()
-    } catch(err) {
-        manageMessages("#b_mess", "d", "Error during verification request. Check your internet connection and try again");
+        return await response.json()
+    } catch(ex) {
+        manageMessages("#b_mess", "d", "Error during command generation. Check your internet connection and try again");
     }
 }
 
 async function execOnReader(reader, commands) {
     try{
-        if (!reader)
-            throw 'Card not found on reader';
-        await reader.connect(true);
         const results = []
         if(!Array.isArray(commands))
             commands = [commands]
@@ -195,8 +197,8 @@ async function execOnReader(reader, commands) {
                     status: 'ok',
                     name: c.name
                 })
-            } catch(err){
-                console.warn('Error during apdu execution', err)
+            } catch(ex){
+                console.log(ex);
                 results.push({
                     status: 'incomplete',
                     name: c.name
@@ -206,9 +208,7 @@ async function execOnReader(reader, commands) {
         }
         return results
     } catch(ex) {
-        manageMessages("#b_mess", "d", ex.message);
-    } finally {
-        reader.disconnect();
+        manageMessages("#b_mess", "d", ex);
     }
 }
 
@@ -237,46 +237,9 @@ function manageMessages(dest, type, message)
     }
 }
 
-function fetchPartialPage(url, dest)
-{
-    fetch(url).then(function (response) {
-        return response.text();
-    }).then(function (html) {
-        var parser = new DOMParser();
-        var doc = parser.parseFromString(html, 'text/html');
-        d.querySelector(dest).innerHTML = doc.body.innerHTML;
-        d.querySelector("#b_mess").innerHTML = "Card data loaded";
-        executePartialScript(_cardType);
-    }).catch(function (err) {
-        manageMessages("#b_mess", "d", "Error loading card interface. Check your internet connection and try again");
-    }
-    );
-}
-
-const countDownClock = (number = 100, format = 'seconds') => {
-    let countdown;
-    timer(number);
-    function timer(seconds) {
-        const now = Date.now();
-        const then = now + seconds * 1000;
-        countdown = setInterval(() => {
-            const secondsLeft = Math.round((then - Date.now()) / 1000);
-            if(secondsLeft <= 0) {
-                clearInterval(countdown);
-                d.querySelector('#opt').innerHTML = '';
-                return;
-            };
-            displayTimeLeft(secondsLeft);
-        },1000);
-    }
-    function displayTimeLeft(seconds) {
-        d.querySelector('.seconds').textContent = seconds % 60 < 10 ? `0${seconds % 60}` : seconds % 60;
-    }
-}
-
-async function runCommand(commandName, cardId, reader, params = null) {
+async function runCommand(commandName, cardId, reader, params = null, request = null) {
     try {
-        const command = await getCommand(cardId, commandName);
+        const command = (!request)?await getCommand(cardId, commandName, request):await generateCommand(cardId, commandName, request);
         if(!command)
             throw 'Command not found';
         return await execOnReader(reader, {
@@ -285,7 +248,7 @@ async function runCommand(commandName, cardId, reader, params = null) {
             params: params
         });
     } catch(ex) {
-        manageMessages("#b_mess", "d", ex.message);
+        manageMessages("#b_mess", "d", ex);
     }
 }
 
@@ -294,52 +257,66 @@ async function executePartialScript(card_type)
     switch(card_type)
     {
         case 'F':
-            showSpinner();
+            let result;
             try{
-                let result;
+                showSpinner();
+                if (!_reader)
+                    throw 'Card not found on reader';
+                await _reader.connect(true);
                 result = await runCommand("SelectBeCard", _cardId, _reader);
                 if (result[0].status != "ok")
                     throw 'Applet not found';
-                d.querySelector("#f_mess").innerHTML = "Card selected";
-                d.querySelector("#f_mess").classList.replace("text-danger", "text-success");
+                manageMessages("#f_mess", "s", "Card selected");
+                manageMessages("#b_mess", "s", "");
                 result = await runCommand("ReadSequenceInfo", _cardId, _reader);
-                if (result[0].status == "ok")
-                {
-                    d.querySelector("#b_mess").innerHTML = "Card data loaded";
-                    result[0].result.cmdRes.forEach((sequence, index) => {
-                        d.querySelector("#sequences").add(new Option(sequence, sequence));
-                    })
-                }
             } catch(ex) {
-                manageMessages("#b_mess", "d", ex.message);
+                manageMessages("#b_mess", "d", ex);
             } finally {
                 hideSpinner();
+                _reader.disconnect();
             }
-            d.querySelector('#getOtp').addEventListener('click', async function(event){
-                try{
-                    let sequence = d.querySelector("#sequences").value;
-                    if (!sequence)
-                        throw "Select a sequence to get OTP";
-                    if (await verifyTokenByEmail(sequence).result == "0")
-                        throw "OTP sequence not associated to your email";
-                    let result;
-                    result = await runCommand("SelectBeCard", _cardId, _reader);
-                    result = await runCommand("ReadOtpToken", _cardId, _reader, {"OtpMode": sequence});
-                    if (result[0].status == "ok")
-                    {
-                        d.querySelector("#otp").innerHTML = result[0].result.cmdRes[0];
-                        countDownClock(30);
+            if (result[0].status == "ok")
+            {
+                manageMessages("#f_mess", "d", "Card already in use, to perform this operation you need a factory resetted card");
+                d.querySelector("#run_perso").disabled = true
+                break;
+            }
+            else
+            {
+                manageMessages("#f_mess", "s", "Card personalization available, this card is empty");
+                d.querySelector("#run_perso").disabled = false
+                d.querySelector('#run_perso').addEventListener('click', async function(e){
+                    e.preventDefault();
+                    try{
+                        await _reader.connect(true);
+                        result = await runCommand("SelectBeCard", _cardId, _reader);
+                        if (result[0].status != "ok")
+                            throw 'Applet not found';
+                        result = await runCommand("PersonalizeF", _cardId, _reader, null, {"token": d.querySelector("#token").value});
+                        if (result[0].status != "ok")
+                            throw 'Card personalization error';
+                        result = await runCommand("ReadSequenceInfo", _cardId, _reader);
+                        if (result[0].status == "ok")
+                        {
+                            d.querySelector("#b_mess").innerHTML = "Card data updated successfully";
+                            result[0].result.cmdRes.forEach((sequence, index) => {
+                                d.querySelector("#b_mess").innerHTML += sequence;
+                            })
+                        }
+                        else
+                            throw "Card personalization error";
+
+                    } catch(ex) {
+                        manageMessages("#b_mess", "d", ex);
+                    } finally {
+                        hideSpinner();
+                        _reader.disconnect();
                     }
-                    else
-                        throw "OTP not generated by card";
-                } catch(ex) {
-                    manageMessages("#b_mess", "d", ex.message);
-                }
-            });
-            break;
-        case 'C':
+                });
+            }
             break;
         default:
+            manageMessages("#b_mess", "d", "Card type doesn't support cloud personalization");
             break;
     }
 

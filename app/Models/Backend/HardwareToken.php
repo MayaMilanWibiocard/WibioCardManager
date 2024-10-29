@@ -11,6 +11,7 @@ use App\Models\Sales\CustomerCard;
 class HardwareToken extends Model
 {
     use HasFactory;
+    protected $connection = 'backend';
     protected $hidden = ['tkey'];
     protected $fillable = [
         'company',

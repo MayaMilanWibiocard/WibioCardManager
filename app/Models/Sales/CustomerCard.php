@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use App\Models\Backend\HardwareToken;
 use App\Models\Sales\Customer;
+use App\Models\Sales\crmProduct;
+use App\Models\Sales\crmProductDeal;
 
 class CustomerCard extends Model
 {
@@ -23,5 +25,15 @@ class CustomerCard extends Model
     public function Customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class, 'id', 'crm_product_id');
+    }
+
+    public function crmProduct(): BelongsTo
+    {
+        return $this->belongsTo(CrmProduct::class);
+    }
+
+    public function crmProductDeal(): BelongsTo
+    {
+        return $this->belongsTo(CrmProductDeal::class);
     }
 }

@@ -36,7 +36,7 @@
                         @if($HardwareToken->owner)
                             {{ $HardwareToken->owner }} - {{ $HardwareToken->email }}
                         @else
-                            <a href="" class="btn btn-primary"><i class="bi bi-small bi-key-fill text-light"></i></a>
+                            <a href="{{ route('cards.attach', [$team->id, $HardwareToken->token]) }}" class="btn btn-primary ms-2"><i class="bi bi-small bi-key-fill text-light"></i></a>
                         @endif
                     </td>
                     <td>

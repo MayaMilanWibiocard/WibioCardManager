@@ -11,8 +11,9 @@ export default defineConfig({
                 'resources/js/vanilla.js',
                 'resources/js/webcard.js',
                 'resources/js/cardmanager.js',
+                'resources/js/cardpersonalizer.js',
             ],
-            refresh: true,
+            refresh: true
         }),
     ],
 });
